@@ -4,4 +4,6 @@ __pycache__/
 .venv/
 .pytest_cache/
 agent-sentry.sarif
+agent-sentry-report.html
+report.html
 uv.lock
