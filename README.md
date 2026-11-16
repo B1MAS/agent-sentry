@@ -14,6 +14,7 @@ agent-sentry scan . --format sarif > agent-sentry.sarif
 agent-sentry check-call --policy examples/policy.json --call examples/tool-call.json
 agent-sentry scan . --format html > agent-sentry-report.html
 cat examples/tool-calls.jsonl | agent-sentry gate --policy examples/policy.json --ledger run.jsonl
+cat examples/mcp-call.json | agent-sentry mcp-check --policy examples/policy.json
 ```
 
 The unsafe fixture is intentionally harmless text. It demonstrates findings without contacting a network or running a command.
@@ -37,6 +38,8 @@ The policy prototype can evaluate a tool call before execution and the ledger mo
 The HTML report is self-contained and can be opened locally or attached to a pull request without uploading source code.
 
 `gate` is a deterministic runtime prototype: it reads newline-delimited tool calls, emits an `allow`, `ask` or `deny` decision, and records only redacted metadata in the optional ledger. It never executes the tool call.
+
+`mcp-check` applies the same policy to MCP JSON-RPC `tools/call` and `resources/read` requests. The prototype deliberately stops at the policy boundary; the next adapter can forward only allowed requests to an upstream MCP server.
 
 This is a static signal scanner, not a sandbox and not proof that a skill is safe. Use it as a review gate with least-privilege policies and isolated execution.
 

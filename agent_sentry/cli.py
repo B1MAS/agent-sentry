@@ -6,6 +6,7 @@ from .policy import decide, load_policy
 from .ledger import replay
 from .ledger import append_event
 from .report import render_html
+from .mcp import decision_for_jsonrpc
 
 def main() -> int:
     parser = argparse.ArgumentParser(prog="agent-sentry", description="Scan AI agent skills and MCP configs before they run.")
@@ -22,6 +23,8 @@ def main() -> int:
     gate = sub.add_parser("gate", help="gate newline-delimited tool calls from stdin")
     gate.add_argument("--policy", required=True)
     gate.add_argument("--ledger")
+    mcp = sub.add_parser("mcp-check", help="check MCP JSON-RPC requests from stdin")
+    mcp.add_argument("--policy", required=True)
     args = parser.parse_args()
     if args.command == "check-call":
         result = decide(json.loads(open(args.call, encoding="utf-8").read()), load_policy(args.policy))
@@ -45,6 +48,18 @@ def main() -> int:
             print(json.dumps(output, ensure_ascii=False), flush=True)
             if args.ledger:
                 previous = append_event(args.ledger, {"event": "tool_call", "tool": call.get("tool", ""), "decision": result.action, "reason": result.reason}, previous)
+            if result.action == "deny":
+                exit_code = 1
+        return exit_code
+    if args.command == "mcp-check":
+        policy = load_policy(args.policy)
+        exit_code = 0
+        for line in sys.stdin:
+            if not line.strip():
+                continue
+            request = json.loads(line)
+            result = decision_for_jsonrpc(request, policy)
+            print(json.dumps({"id": request.get("id"), "decision": result.action, "reason": result.reason}, ensure_ascii=False), flush=True)
             if result.action == "deny":
                 exit_code = 1
         return exit_code
