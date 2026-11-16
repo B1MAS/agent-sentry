@@ -3,13 +3,14 @@ import json
 from .scanner import scan, sarif
 from .policy import decide, load_policy
 from .ledger import replay
+from .report import render_html
 
 def main() -> int:
     parser = argparse.ArgumentParser(prog="agent-sentry", description="Scan AI agent skills and MCP configs before they run.")
     sub = parser.add_subparsers(dest="command", required=True)
     cmd = sub.add_parser("scan", help="scan a directory")
     cmd.add_argument("path", nargs="?", default=".")
-    cmd.add_argument("--format", choices=["text", "json", "sarif"], default="text")
+    cmd.add_argument("--format", choices=["text", "json", "sarif", "html"], default="text")
     cmd.add_argument("--fail-on", choices=["critical", "high", "medium", "never"], default="high")
     check = sub.add_parser("check-call", help="evaluate a tool call against a policy")
     check.add_argument("--policy", required=True)
@@ -31,6 +32,8 @@ def main() -> int:
         print(json.dumps(report, indent=2, ensure_ascii=False))
     elif args.format == "sarif":
         print(json.dumps(sarif(report), indent=2, ensure_ascii=False))
+    elif args.format == "html":
+        print(render_html(report))
     else:
         print(f"AgentSentry scanned {report['scanned_files']} files")
         print("Findings: " + ", ".join(f"{k}={v}" for k, v in report["counts"].items()))

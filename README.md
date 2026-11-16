@@ -12,6 +12,7 @@ agent-sentry scan examples/unsafe-skill
 agent-sentry scan examples/safe-skill
 agent-sentry scan . --format sarif > agent-sentry.sarif
 agent-sentry check-call --policy examples/policy.json --call examples/tool-call.json
+agent-sentry scan . --format html > agent-sentry-report.html
 ```
 
 The unsafe fixture is intentionally harmless text. It demonstrates findings without contacting a network or running a command.
@@ -31,6 +32,8 @@ AI agents increasingly load third-party skills and MCP tools that can read files
 - simple obfuscation patterns
 
 The policy prototype can evaluate a tool call before execution and the ledger module can verify an append-only, hash-chained JSONL run record.
+
+The HTML report is self-contained and can be opened locally or attached to a pull request without uploading source code.
 
 This is a static signal scanner, not a sandbox and not proof that a skill is safe. Use it as a review gate with least-privilege policies and isolated execution.
 
