@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Local-first security scanner for AI agent skills and MCP configurations"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
 keywords = ["ai", "agents", "mcp", "security", "prompt-injection", "supply-chain"]
 
 [project.scripts]

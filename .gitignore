@@ -8,4 +8,7 @@ agent-sentry-report.html
 report.html
 gate-run.jsonl
 demo-ledger.jsonl
+dist/
+build/
+*.egg-info/
 uv.lock
