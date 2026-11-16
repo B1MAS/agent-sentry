@@ -1,8 +1,10 @@
 import argparse
 import json
+import sys
 from .scanner import scan, sarif
 from .policy import decide, load_policy
 from .ledger import replay
+from .ledger import append_event
 from .report import render_html
 
 def main() -> int:
@@ -17,6 +19,9 @@ def main() -> int:
     check.add_argument("--call", required=True)
     rep = sub.add_parser("replay", help="verify and print a JSONL action ledger")
     rep.add_argument("path")
+    gate = sub.add_parser("gate", help="gate newline-delimited tool calls from stdin")
+    gate.add_argument("--policy", required=True)
+    gate.add_argument("--ledger")
     args = parser.parse_args()
     if args.command == "check-call":
         result = decide(json.loads(open(args.call, encoding="utf-8").read()), load_policy(args.policy))
@@ -27,6 +32,22 @@ def main() -> int:
         for event in events:
             print(f"{'OK' if event['valid_hash'] else 'BROKEN'} {event.get('ts', '')} {event.get('event', '')} {event.get('decision', '')}")
         return 0 if all(event["valid_hash"] for event in events) else 1
+    if args.command == "gate":
+        policy = load_policy(args.policy)
+        previous = ""
+        exit_code = 0
+        for line in sys.stdin:
+            if not line.strip():
+                continue
+            call = json.loads(line)
+            result = decide(call, policy)
+            output = {"tool": call.get("tool", ""), "decision": result.action, "reason": result.reason}
+            print(json.dumps(output, ensure_ascii=False), flush=True)
+            if args.ledger:
+                previous = append_event(args.ledger, {"event": "tool_call", "tool": call.get("tool", ""), "decision": result.action, "reason": result.reason}, previous)
+            if result.action == "deny":
+                exit_code = 1
+        return exit_code
     report = scan(args.path)
     if args.format == "json":
         print(json.dumps(report, indent=2, ensure_ascii=False))
