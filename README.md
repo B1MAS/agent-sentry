@@ -48,6 +48,8 @@ This is a static signal scanner, not a sandbox and not proof that a skill is saf
 - optional local-model explanations with no source upload
 - signed reports and package reputation metadata
 
+Architecture details are in [docs/architecture.md](docs/architecture.md). On Windows, run `./scripts/demo.ps1` for the complete local demonstration.
+
 ## Contributing
 
 Add a focused rule with a safe fixture and a test. Rules must include a false-positive note and never execute fixture payloads.
