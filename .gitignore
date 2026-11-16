@@ -6,4 +6,5 @@ __pycache__/
 agent-sentry.sarif
 agent-sentry-report.html
 report.html
+gate-run.jsonl
 uv.lock
