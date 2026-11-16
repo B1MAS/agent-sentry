@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "defaults": {"filesystem": "ask", "network": "ask", "shell": "deny"},
+  "rules": [
+    {"tool": "read_file", "path": "workspace/**", "decision": "allow"},
+    {"tool": "read_file", "path": "**/.env", "decision": "deny"},
+    {"tool": "http_request", "host": "api.example.com", "decision": "ask"}
+  ]
+}
