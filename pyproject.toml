@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-sentry"
+version = "0.1.0"
+description = "Local-first security scanner for AI agent skills and MCP configurations"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["ai", "agents", "mcp", "security", "prompt-injection", "supply-chain"]
+
+[project.scripts]
+agent-sentry = "agent_sentry.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["agent_sentry*"]
